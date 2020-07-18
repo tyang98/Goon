@@ -1,4 +1,4 @@
-package gInterpreter;
+package Goon;
 
 enum TokenType {
    // Single-character tokens.

@@ -1,8 +1,10 @@
-package gInterpreter;
+package Goon;
+
+;
 
 class Token {
   final TokenType type;
-  final String lexeme; 
+  final String lexeme;
   final Object literal;
   final int line;
 
