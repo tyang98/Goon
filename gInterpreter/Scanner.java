@@ -103,7 +103,11 @@ class Scanner {
         if (match('/')) {
           while (peek() != '\n' && !isAtEnd())
             advance();
-        } else {
+        }
+        /*
+         * else if (match('*')) { blockComment(); }
+         */
+        else {
           addToken(SLASH);
         }
         break;
@@ -156,6 +160,12 @@ class Scanner {
     return c >= '0' && c <= '9';
   }
 
+  /*
+   * private void blockComment() { int nesting = 1; while (nesting > 0) { if
+   * (peek() == '\0') { Goon.error(line, "Unterminated block comment"); return; }
+   * 
+   * if (peek() == '/' && peekNext() == '*') { peekNext(); peekNext(); } } }
+   */
   private void number() {
     while (isDigit(peek()))
       advance();
