@@ -1,3 +1,8 @@
 /Goon.class
 /Scanner.class
 /Token.class
+/Expr.class
+/Expr$Binary.class
+/Expr$Literal.class
+/Expr$Unary.class
+/Expr$Grouping.class
