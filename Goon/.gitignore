@@ -6,3 +6,5 @@
 /Expr$Literal.class
 /Expr$Unary.class
 /Expr$Grouping.class
+/Expr$Visitor.class
+/AstPrinter.class
