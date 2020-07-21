@@ -10,3 +10,6 @@
 /AstPrinter.class
 /Parser.class
 /Interpreter.class
+/Parser$ParseError.class
+/Interpreter$1.class
+/RuntimeError.class
