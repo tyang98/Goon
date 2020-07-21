@@ -4,6 +4,10 @@ import java.util.List;
 import static Goon.TokenType.*;
 
 class Parser {
+
+  private static class ParseError extends RuntimeException {
+  }
+
   private final List<Token> tokens;
   private int current = 0;
 
@@ -80,6 +84,56 @@ class Parser {
     if (match(NUMBER, STRING)) {
       return new Expr.Literal(previous().literal);
     }
+
+    if (match(LEFT_PAREN)) {
+      Expr expr = expression();
+      consume(RIGHT_PAREN, "Expect ')' after expression.");
+      return new Expr.Grouping(expr);
+    }
+
+    throw error(peek(), "Expect expression.");
+  }
+
+  private void synchronize() {
+    advance();
+
+    while (!isAtEnd()) {
+      if (previous().type == SEMICOLON)
+        return;
+
+      switch (peek().type) {
+        case CLASS:
+        case FUN:
+        case BOOMER:
+        case FOR:
+        case IF:
+        case WHILE:
+        case PRINT:
+        case RETURN:
+          return;
+      }
+
+      advance();
+    }
+  }
+
+  Expr parse() {
+    try {
+      return expression();
+    } catch (ParseError error) {
+      return null;
+    }
+  }
+
+  private Token consume(TokenType type, String message) {
+    if (check(type))
+      return advance();
+    throw error(peek(), message);
+  }
+
+  private ParseError error(Token token, String message) {
+    Goon.error(token, message);
+    return new ParseError();
   }
 
   private boolean match(TokenType... types) {
