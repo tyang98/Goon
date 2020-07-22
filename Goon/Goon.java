@@ -45,6 +45,8 @@ public class Goon {
       if (line == null)
         break;
       run(line);
+
+      hadError = false;
     }
   }
 

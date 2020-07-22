@@ -13,6 +13,7 @@ class Scanner {
   private int current = 0;
   private int line = 1;
 
+  // keyword map
   private static final Map<String, TokenType> keywords;
 
   static {
@@ -139,13 +140,13 @@ class Scanner {
     while (isAlphaNumeric(peek()))
       advance();
 
+    // See if identifier is a reserved word
     String text = source.substring(start, current);
 
     TokenType type = keywords.get(text);
     if (type == null)
       type = IDENTIFIER;
     addToken(type);
-    addToken(IDENTIFIER);
   }
 
   private boolean isAlpha(char c) {
