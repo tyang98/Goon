@@ -13,3 +13,7 @@
 /Parser$ParseError.class
 /Interpreter$1.class
 /RuntimeError.class
+/Stmt.class
+/Stmt$Expression.class
+/Stmt$Print.class
+/Stmt$Visitor.class
