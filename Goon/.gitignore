@@ -3,6 +3,7 @@
 /Token.class
 /Expr.class
 /Environment.class
+/Expr$Assign.class
 /Expr$Binary.class
 /Expr$Literal.class
 /Expr$Unary.class
