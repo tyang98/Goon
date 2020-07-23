@@ -2,11 +2,13 @@
 /Scanner.class
 /Token.class
 /Expr.class
+/Environment.class
 /Expr$Binary.class
 /Expr$Literal.class
 /Expr$Unary.class
 /Expr$Grouping.class
 /Expr$Visitor.class
+/Expr$Variable.class
 /AstPrinter.class
 /Parser.class
 /Interpreter.class
@@ -17,3 +19,4 @@
 /Stmt$Expression.class
 /Stmt$Print.class
 /Stmt$Visitor.class
+/Stmt$Boomer.class
