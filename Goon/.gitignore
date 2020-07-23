@@ -7,6 +7,7 @@
 /Expr$Binary.class
 /Expr$Literal.class
 /Expr$Unary.class
+/Expr$Logical.class
 /Expr$Grouping.class
 /Expr$Visitor.class
 /Expr$Variable.class
@@ -22,3 +23,4 @@
 /Stmt$Visitor.class
 /Stmt$Boomer.class
 /Stmt$Block.class
+/Stmt$If.class
