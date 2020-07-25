@@ -11,6 +11,7 @@
 /Expr$Grouping.class
 /Expr$Visitor.class
 /Expr$Variable.class
+/Expr$Call.class
 /AstPrinter.class
 /Parser.class
 /Interpreter.class
@@ -24,4 +25,6 @@
 /Stmt$Boomer.class
 /Stmt$Block.class
 /Stmt$If.class
+/Stmt$Function.class
 /Stmt$While.class
+/GoonCallable.class
