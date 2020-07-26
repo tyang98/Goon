@@ -4,9 +4,11 @@ import java.util.List;
 
 class GoonFunction implements GoonCallable {
   private final Stmt.Function declaration;
-
-  GoonFunction(Stmt.Function declaration) {
+  private final Environment closure;
+  
+  GoonFunction(Stmt.Function declaration, Environment closure) {
     this.declaration = declaration;
+    this.closure = closure;
   }
 
   @Override 

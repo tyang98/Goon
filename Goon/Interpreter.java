@@ -163,7 +163,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
   @Override
   public Void visitFunctionStmt(Stmt.Function stmt) {
-    GoonFunction function = new GoonFunction(stmt);
+    GoonFunction function = new GoonFunction(stmt, environment);
     environment.define(stmt.name.lexeme, function);
     return null;
   }
