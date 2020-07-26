@@ -26,5 +26,6 @@
 /Stmt$Block.class
 /Stmt$If.class
 /Stmt$Function.class
+/Stmt$Return.class
 /Stmt$While.class
 /GoonCallable.class
