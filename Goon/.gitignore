@@ -30,3 +30,5 @@
 /Stmt$While.class
 /GoonCallable.class
 /GoonFunction.class
+/Resolver.class
+/Resolver$FunctionType.class
