@@ -3,6 +3,7 @@ package Goon;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
+
 import java.util.HashMap;
 
 class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
@@ -234,6 +235,29 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
   }
 
   @Override
+  public Object visitGetExpr(Expr.Get expr) {
+    Object object = evaluate(expr.object);
+    if (object instanceof GoonInstance) {
+      return ((GoonInstance) object).get(expr.name);
+    }
+
+    throw new RuntimeError(expr.name, "Only instances have properties.");
+  }
+
+  @Override
+  public Object visitSetExpr(Expr.Set expr) {
+    Object object = evaluate(expr.object);
+
+    if (!(object instanceof GoonInstance)) {
+      throw new RuntimeError(expr.name, "Only instances have fields.");
+    }
+
+    Object value = evaluate(expr.value);
+    ((GoonInstance)object).set(expr.name, value);
+    return value;
+  }
+
+  @Override
   public Void visitWhileStmt(Stmt.While stmt) {
     while (isTruthy(evaluate(stmt.condition))) {
       execute(stmt.body);
@@ -244,7 +268,13 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
   @Override
   public Void visitClassStmt(Stmt.Class stmt) {
     environment.define(stmt.name.lexeme, null);
-    GoonClass klass = new GoonClass(stmt.name.lexeme);
+
+    Map<String, GoonFunction> methods = new HashMap<>();
+    for (Stmt.Function method : stmt.methods) {
+      GoonFunction function = new GoonFunction(method, environment);
+      methods.put(method.name.lexeme, function);
+    }
+    GoonClass klass = new GoonClass(stmt.name.lexeme, methods);
     environment.assign(stmt.name, klass);
     return null;
   }

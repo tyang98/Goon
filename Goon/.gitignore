@@ -7,6 +7,8 @@
 /Expr$Binary.class
 /Expr$Literal.class
 /Expr$Unary.class
+/Expr$Set.class
+/Expr$Get.class
 /Expr$Logical.class
 /Expr$Grouping.class
 /Expr$Visitor.class
