@@ -9,6 +9,7 @@
 /Expr$Unary.class
 /Expr$Set.class
 /Expr$Get.class
+/Expr$This.class
 /Expr$Logical.class
 /Expr$Grouping.class
 /Expr$Visitor.class

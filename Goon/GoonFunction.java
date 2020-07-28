@@ -11,6 +11,12 @@ class GoonFunction implements GoonCallable {
     this.closure = closure;
   }
 
+  GoonFunction bind(GoonInstance instance) {
+    Environment environment = new Environment(closure);
+    environment.define("this", instance);
+    return new GoonFunction(declaration, environment);
+  }
+
   @Override 
   public int arity() {
     return declaration.params.size();
