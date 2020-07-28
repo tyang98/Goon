@@ -21,6 +21,7 @@
 /Stmt.class
 /Stmt$Expression.class
 /Stmt$Print.class
+/Stmt$Class.class
 /Stmt$Visitor.class
 /Stmt$Boomer.class
 /Stmt$Block.class
@@ -29,6 +30,9 @@
 /Stmt$Return.class
 /Stmt$While.class
 /GoonCallable.class
+/GoonInstance.class
+/GoonClass.class
 /GoonFunction.class
 /Resolver.class
 /Resolver$FunctionType.class
+
