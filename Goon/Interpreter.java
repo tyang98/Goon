@@ -188,7 +188,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
   @Override
   public Void visitFunctionStmt(Stmt.Function stmt) {
-    GoonFunction function = new GoonFunction(stmt, environment);
+    GoonFunction function = new GoonFunction(stmt, environment, false);
     environment.define(stmt.name.lexeme, function);
     return null;
   }
@@ -276,7 +276,8 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     Map<String, GoonFunction> methods = new HashMap<>();
     for (Stmt.Function method : stmt.methods) {
-      GoonFunction function = new GoonFunction(method, environment);
+      GoonFunction function = new GoonFunction(method, environment, 
+        method.name.lexeme.equals("init"));
       methods.put(method.name.lexeme, function);
     }
     GoonClass klass = new GoonClass(stmt.name.lexeme, methods);

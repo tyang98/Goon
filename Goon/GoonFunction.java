@@ -5,16 +5,18 @@ import java.util.List;
 class GoonFunction implements GoonCallable {
   private final Stmt.Function declaration;
   private final Environment closure;
+  private final boolean isInitializer;
   
-  GoonFunction(Stmt.Function declaration, Environment closure) {
+  GoonFunction(Stmt.Function declaration, Environment closure, boolean isInitializer) {
     this.declaration = declaration;
     this.closure = closure;
+    this.isInitializer = isInitializer;
   }
 
   GoonFunction bind(GoonInstance instance) {
     Environment environment = new Environment(closure);
     environment.define("this", instance);
-    return new GoonFunction(declaration, environment);
+    return new GoonFunction(declaration, environment, isInitializer);
   }
 
   @Override 
@@ -31,8 +33,11 @@ class GoonFunction implements GoonCallable {
     try {
       interpreter.executeBlock(declaration.body, environment);
     } catch (Return returnValue) {
+      if (isInitializer) return closure.getAt(0, "this");
       return returnValue.value;
     }
+
+    if (isInitializer) return closure.getAt(0, "this");
     return null;
   }
 
