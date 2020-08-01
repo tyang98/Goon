@@ -5,10 +5,12 @@ import java.util.Map;
 
 class GoonClass implements GoonCallable {
   final String name;
+  final GoonClass superclass;
   private final Map<String, GoonFunction> methods;
 
-  GoonClass(String name, Map<String, GoonFunction> methods) {
+  GoonClass(String name, GoonClass superclass, Map<String, GoonFunction> methods) {
     this.name = name;
+    this.superclass = superclass;
     this.methods = methods;
   }
 
@@ -27,13 +29,18 @@ class GoonClass implements GoonCallable {
       return methods.get(name);
     }
 
+    if (superclass != null) {
+      return superclass.findMethod(name);
+    }
+
     return null;
   }
 
   @Override
   public int arity() {
     GoonFunction initializer = findMethod("init");
-    if (initializer == null) return 0;
+    if (initializer == null)
+      return 0;
     return initializer.arity();
   }
 

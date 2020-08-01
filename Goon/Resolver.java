@@ -14,17 +14,13 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
   Resolver(Interpreter interpreter) {
     this.interpreter = interpreter;
   }
-  
+
   private enum FunctionType {
-    NONE,
-    FUNCTION,
-    INITIALIZER,
-    METHOD
+    NONE, FUNCTION, INITIALIZER, METHOD
   }
 
   private enum ClassType {
-    NONE,
-    CLASS
+    NONE, CLASS, SUBCLASS
   }
 
   @Override
@@ -47,10 +43,8 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
   @Override
   public Void visitVariableExpr(Expr.Variable expr) {
-    if (!scopes.isEmpty() &&
-        scopes.peek().get(expr.name.lexeme) == Boolean.FALSE) {
-      Goon.error(expr.name,
-          "Cannot read local variable in its own initializer.");
+    if (!scopes.isEmpty() && scopes.peek().get(expr.name.lexeme) == Boolean.FALSE) {
+      Goon.error(expr.name, "Cannot read local variable in its own initializer.");
     }
 
     resolveLocal(expr, expr.name);
@@ -63,11 +57,12 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     return null;
   }
 
-  @Override 
+  @Override
   public Void visitIfStmt(Stmt.If stmt) {
     resolve(stmt.condition);
     resolve(stmt.thenBranch);
-    if (stmt.elseBranch != null) resolve(stmt.elseBranch);
+    if (stmt.elseBranch != null)
+      resolve(stmt.elseBranch);
     return null;
   }
 
@@ -78,11 +73,36 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
   }
 
   @Override
+  public Void visitSuperExpr(Expr.Super expr) {
+    if (currentClass == ClassType.NONE) {
+      Goon.error(expr.keyword, "Cannot use 'super' outside of a class.");
+    } else if (currentClass != ClassType.SUBCLASS) {
+      Goon.error(expr.keyword, "Cannot use 'super' in a class with no superclass.");
+    }
+    resolveLocal(expr, expr.keyword);
+    return null;
+  }
+
+  @Override
   public Void visitClassStmt(Stmt.Class stmt) {
     ClassType enclosingClass = currentClass;
     currentClass = ClassType.CLASS;
     declare(stmt.name);
     define(stmt.name);
+
+    if (stmt.superclass != null && stmt.name.lexeme.equals(stmt.superclass.name.lexeme)) {
+      Goon.error(stmt.superclass.name, "A class cannot inherit from itself.");
+    }
+
+    if (stmt.superclass != null) {
+      currentClass = ClassType.SUBCLASS;
+      resolve(stmt.superclass);
+    }
+
+    if (stmt.superclass != null) {
+      beginScope();
+      scopes.peek().put("super", true);
+    }
 
     beginScope();
     scopes.peek().put("this", true);
@@ -121,7 +141,7 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     return null;
   }
 
-  @Override 
+  @Override
   public Void visitFunctionStmt(Stmt.Function stmt) {
     declare(stmt.name);
     define(stmt.name);
@@ -143,7 +163,7 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     resolveLocal(expr, expr.name);
     return null;
   }
-  
+
   @Override
   public Void visitThisExpr(Expr.This expr) {
     if (currentClass == ClassType.NONE) {
@@ -172,7 +192,7 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     resolve(expr.object);
     return null;
   }
- 
+
   @Override
   public Void visitCallExpr(Expr.Call expr) {
     resolve(expr.callee);
@@ -188,7 +208,7 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     return null;
   }
 
-  @Override 
+  @Override
   public Void visitLogicalExpr(Expr.Logical expr) {
     resolve(expr.left);
     resolve(expr.right);
@@ -200,7 +220,6 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     resolve(expr.right);
     return null;
   }
-
 
   private void resolveFunction(Stmt.Function function, FunctionType type) {
     FunctionType enclosingFunction = currentFunction;
@@ -247,7 +266,8 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
   }
 
   private void declare(Token name) {
-    if (scopes.isEmpty()) return;
+    if (scopes.isEmpty())
+      return;
 
     Map<String, Boolean> scope = scopes.peek();
     if (scope.containsKey(name.lexeme)) {
@@ -257,8 +277,9 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
   }
 
   private void define(Token name) {
-    if (scopes.isEmpty()) return;
+    if (scopes.isEmpty())
+      return;
     scopes.peek().put(name.lexeme, true);
   }
-  
+
 }

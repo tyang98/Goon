@@ -29,7 +29,7 @@ class Parser {
       Expr value = assignment();
 
       if (expr instanceof Expr.Variable) {
-        Token name = ((Expr.Variable)expr).name;
+        Token name = ((Expr.Variable) expr).name;
         return new Expr.Assign(name, value);
       } else if (expr instanceof Expr.Get) {
         Expr.Get get = (Expr.Get) expr;
@@ -119,17 +119,15 @@ class Parser {
   }
 
   private Expr call() {
-    Expr expr = primary(); 
+    Expr expr = primary();
 
     while (true) {
       if (match(LEFT_PAREN)) {
-        expr = finishCall(expr); 
+        expr = finishCall(expr);
       } else if (match(DOT)) {
-        Token name = consume(IDENTIFIER, 
-        "Expect property name after '.'.");
+        Token name = consume(IDENTIFIER, "Expect property name after '.'.");
         expr = new Expr.Get(expr, name);
-      }
-      else {
+      } else {
         break;
       }
     }
@@ -144,7 +142,7 @@ class Parser {
           error(peek(), "Cannot have more than 255 arguments.");
         }
         arguments.add(expression());
-      } while (match (COMMA));
+      } while (match(COMMA));
     }
 
     Token paren = consume(RIGHT_PAREN, "Expect ')' after arguments.");
@@ -164,8 +162,16 @@ class Parser {
       return new Expr.Literal(previous().literal);
     }
 
-    if (match(THIS)) return new Expr.This(previous());
-    
+    if (match(SUPER)) {
+      Token keyword = previous();
+      consume(DOT, "Expect '.' after 'super'");
+      Token method = consume(IDENTIFIER, "Expect superclass method name.");
+      return new Expr.Super(keyword, method);
+    }
+
+    if (match(THIS))
+      return new Expr.This(previous());
+
     if (match(IDENTIFIER)) {
       return new Expr.Variable(previous());
     }
@@ -212,8 +218,10 @@ class Parser {
 
   private Stmt declaration() {
     try {
-      if (match(CLASS)) return classDeclaration();
-      if (match(FUN)) return function("function");
+      if (match(CLASS))
+        return classDeclaration();
+      if (match(FUN))
+        return function("function");
       if (match(BOOMER))
         return boomerDeclaration();
       return statement();
@@ -225,6 +233,13 @@ class Parser {
 
   private Stmt classDeclaration() {
     Token name = consume(IDENTIFIER, "Expect class name.");
+
+    Expr.Variable superclass = null;
+    if (match(LESS)) {
+      consume(IDENTIFIER, "Expect superclass name.");
+      superclass = new Expr.Variable(previous());
+    }
+
     consume(LEFT_BRACE, "Expect '{' before class body.");
 
     List<Stmt.Function> methods = new ArrayList<>();
@@ -234,10 +249,9 @@ class Parser {
 
     consume(RIGHT_BRACE, "Expect '}' after class body.");
 
-    return new Stmt.Class(name, methods);
+    return new Stmt.Class(name, superclass, methods);
   }
 
-  
   private Stmt.Function function(String kind) {
     Token name = consume(IDENTIFIER, "Expect " + kind + " name.");
     consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");
@@ -272,13 +286,17 @@ class Parser {
   }
 
   private Stmt statement() {
-    if (match(FOR)) return forStatement();
-    if (match(IF)) return ifStatement();
+    if (match(FOR))
+      return forStatement();
+    if (match(IF))
+      return ifStatement();
     if (match(PRINT))
       return printStatement();
-    if (match(RETURN)) return returnStatement();
-    if (match(WHILE)) return whileStatement();
-    if (match(LEFT_BRACE)) 
+    if (match(RETURN))
+      return returnStatement();
+    if (match(WHILE))
+      return whileStatement();
+    if (match(LEFT_BRACE))
       return new Stmt.Block(block());
 
     return expressionStatement();
@@ -324,13 +342,14 @@ class Parser {
       body = new Stmt.Block(Arrays.asList(body, new Stmt.Expression(increment)));
     }
 
-    if (condition == null) condition = new Expr.Literal(true);
+    if (condition == null)
+      condition = new Expr.Literal(true);
     body = new Stmt.While(condition, body);
 
     if (initializer != null) {
       body = new Stmt.Block(Arrays.asList(initializer, body));
     }
-    
+
     return body;
   }
 
@@ -364,7 +383,7 @@ class Parser {
       statements.add(declaration());
     }
 
-    consume (RIGHT_BRACE, "Expect '}' after block.");
+    consume(RIGHT_BRACE, "Expect '}' after block.");
     return statements;
   }
 

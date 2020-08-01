@@ -14,25 +14,20 @@ public class GenerateAst {
     String outputDir = args[0];
 
     defineAst(outputDir, "Expr",
-        Arrays.asList("Assign   : Token name, Expr value", 
-            "Binary   : Expr left, Token operator, Expr right", 
-            "Get      : Expr object, Token name",
-            "Grouping : Expr expression",
-            "Call     : Expr callee, Token paren, List<Expr> arguments",
-            "Literal  : Object value", 
-            "Logical  : Expr left, Token operator, Expr right",
-            "This     : Token keyword",
-            "Set      : Expr object, Token name, Expr value",
+        Arrays.asList("Assign   : Token name, Expr value", "Binary   : Expr left, Token operator, Expr right",
+            "Get      : Expr object, Token name", "Grouping : Expr expression",
+            "Call     : Expr callee, Token paren, List<Expr> arguments", "Literal  : Object value",
+            "Logical  : Expr left, Token operator, Expr right", "Super    : Token keyword, Token method",
+            "This     : Token keyword", "Set      : Expr object, Token name, Expr value",
             "Unary    : Token operator, Expr right", "Variable : Token name"));
 
-    defineAst(outputDir, "Stmt", Arrays.asList("Block    : List<Stmt> statements", "Expression : Expr expression",
-        "Class      : Token name, List<Stmt.Function> methods",
-        "Function : Token name, List<Token> params, List<Stmt> body", 
-        "If     : Expr condition, Stmt thenBranch, Stmt elseBranch",
-        "Print  : Expr expression",
-        "Return : Token keyword, Expr value",
-        "Boomer : Token name, Expr initializer",
-        "While  : Expr condition, Stmt body"));
+    defineAst(outputDir, "Stmt",
+        Arrays.asList("Block    : List<Stmt> statements", "Expression : Expr expression",
+            "Class      : Token name, Expr.Variable superclass," + " List<Stmt.Function> methods",
+            "Function : Token name, List<Token> params, List<Stmt> body",
+            "If     : Expr condition, Stmt thenBranch, Stmt elseBranch", "Print  : Expr expression",
+            "Return : Token keyword, Expr value", "Boomer : Token name, Expr initializer",
+            "While  : Expr condition, Stmt body"));
   }
 
   public static void defineAst(String outputDir, String baseName, List<String> types) throws IOException {

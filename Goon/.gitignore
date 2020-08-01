@@ -13,6 +13,7 @@
 /Expr$Logical.class
 /Expr$Grouping.class
 /Expr$Visitor.class
+/Expr$Super.class
 /Expr$Variable.class
 /Expr$Call.class
 /AstPrinter.class
@@ -38,4 +39,5 @@
 /GoonFunction.class
 /Resolver.class
 /Resolver$FunctionType.class
+/Resolver$ClassType.class
 

@@ -15,15 +15,19 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
   Interpreter() {
     globals.define("clock", new GoonCallable() {
       @Override
-      public int arity() { return 0; }
+      public int arity() {
+        return 0;
+      }
 
-      @Override 
+      @Override
       public Object call(Interpreter interpreter, List<Object> arguments) {
         return (double) System.currentTimeMillis() / 1000.0;
       }
 
       @Override
-      public String toString() { return "<native fn>"; }
+      public String toString() {
+        return "<native fn>";
+      }
     });
   }
 
@@ -58,7 +62,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     return lookUpVariable(expr.name, expr);
   }
 
-  @Override 
+  @Override
   public Object visitThisExpr(Expr.This expr) {
     return lookUpVariable(expr.keyword, expr);
   }
@@ -131,8 +135,21 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     return value;
   }
 
-  
-  @Override 
+  @Override
+  public Object visitSuperExpr(Expr.Super expr) {
+    int distance = locals.get(expr);
+    GoonClass superclass = (GoonClass) environment.getAt(distance, "super");
+
+    GoonInstance object = (GoonInstance) environment.getAt(distance - 1, "this");
+    GoonFunction method = superclass.findMethod(expr.method.lexeme);
+
+    if (method == null) {
+      throw new RuntimeError(expr.method, "Undefined property '" + expr.method.lexeme + "'.");
+    }
+    return method.bind(object);
+  }
+
+  @Override
   public Object visitCallExpr(Expr.Call expr) {
     Object callee = evaluate(expr.callee);
 
@@ -142,15 +159,13 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     }
 
     if (!(callee instanceof GoonCallable)) {
-      throw new RuntimeError(expr.paren,
-          "Can only call functions and classes.");
+      throw new RuntimeError(expr.paren, "Can only call functions and classes.");
     }
 
-    GoonCallable function = (GoonCallable)callee;
+    GoonCallable function = (GoonCallable) callee;
     if (arguments.size() != function.arity()) {
-      throw new RuntimeError(expr.paren, "Expected " + 
-              function.arity() + " arguments but got " +
-              arguments.size() + ".");
+      throw new RuntimeError(expr.paren,
+          "Expected " + function.arity() + " arguments but got " + arguments.size() + ".");
     }
 
     return function.call(this, arguments);
@@ -196,7 +211,8 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
   @Override
   public Void visitReturnStmt(Stmt.Return stmt) {
     Object value = null;
-    if (stmt.value != null) value = evaluate(stmt.value);
+    if (stmt.value != null)
+      value = evaluate(stmt.value);
 
     throw new Return(value);
   }
@@ -229,10 +245,10 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     Object left = evaluate(expr.left);
 
     if (expr.operator.type == TokenType.OR) {
-      if (isTruthy(left)) 
+      if (isTruthy(left))
         return left;
     } else {
-      if (!isTruthy(left)) 
+      if (!isTruthy(left))
         return left;
     }
 
@@ -258,7 +274,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     }
 
     Object value = evaluate(expr.value);
-    ((GoonInstance)object).set(expr.name, value);
+    ((GoonInstance) object).set(expr.name, value);
     return value;
   }
 
@@ -272,15 +288,31 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
   @Override
   public Void visitClassStmt(Stmt.Class stmt) {
+    Object superclass = null;
+    if (stmt.superclass != null) {
+      superclass = evaluate(stmt.superclass);
+      if (!(superclass instanceof GoonClass)) {
+        throw new RuntimeError(stmt.superclass.name, "Superclass must be a class.");
+      }
+    }
     environment.define(stmt.name.lexeme, null);
+
+    if (stmt.superclass != null) {
+      environment = new Environment(environment);
+      environment.define("super", superclass);
+    }
 
     Map<String, GoonFunction> methods = new HashMap<>();
     for (Stmt.Function method : stmt.methods) {
-      GoonFunction function = new GoonFunction(method, environment, 
-        method.name.lexeme.equals("init"));
+      GoonFunction function = new GoonFunction(method, environment, method.name.lexeme.equals("init"));
       methods.put(method.name.lexeme, function);
     }
-    GoonClass klass = new GoonClass(stmt.name.lexeme, methods);
+    GoonClass klass = new GoonClass(stmt.name.lexeme, (GoonClass) superclass, methods);
+
+    if (superclass != null) {
+      environment = environment.enclosing;
+    }
+
     environment.assign(stmt.name, klass);
     return null;
   }
@@ -346,7 +378,6 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
   }
 
   void resolve(Expr expr, int depth) {
-    locals.put(expr,depth);
+    locals.put(expr, depth);
   }
 }
-
