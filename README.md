@@ -1,2 +1,4 @@
 # Goon
-Interpreter for the Goon Language
+Interpreter for the Goon Language.
+
+Based on the lox language from [Crafting Interpreters](https://craftinginterpreters.com/).
